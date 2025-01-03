@@ -1,0 +1,38 @@
+{
+  "baseUrl": "https://www.archon.gg/wow/builds/{spec}/{class}/{contentType}/{tier}/{difficulty}/{encounter}",
+  "outputPath": "/Applications/World of Warcraft/_retail_/WTF/Account/ACCOUNT_ID/SavedVariables/TalentLoadoutsEx.lua",
+  "characters": [
+    {
+      "name": "Testcharacter",
+      "class": "Warlock",
+      "specializations": [
+        "demonology"
+      ]
+    }
+  ],
+  "mythicPlusTalentTimeSpan":"last-week",
+  "raidDifficulties": [
+    "heroic",
+    "mythic"
+  ],
+  "raidBosses": [
+    "ulgrax",
+    "horror",
+    "sikran",
+    "rashanan",
+    "broodtwister-ovinax",
+    "kyveza",
+    "the-silken-court",
+    "ansurek"
+  ],
+  "dungeons": [
+    "ara-kara-city-of-echoes",
+    "city-of-threads",
+    "grim-batol",
+    "mists-of-tirna-scithe",
+    "siege-of-boralus",
+    "the-dawnbreaker",
+    "the-necrotic-wake",
+    "the-stonevault"
+  ]
+}
