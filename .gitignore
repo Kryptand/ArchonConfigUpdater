@@ -1,6 +1,8 @@
-/.idea/
+/.idea/*
 /bin/
 /out/
 /obj/*
+.DS_Store
+ArchonConfigUpdater.sln.DotSettings.user
 
 settings.json
