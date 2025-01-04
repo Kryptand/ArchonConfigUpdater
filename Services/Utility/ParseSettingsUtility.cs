@@ -1,7 +1,9 @@
 using System.Text.Json;
 using ArchonConfigUpdater.Models;
 
-public class ParseSettings
+namespace ArchonConfigUpdater.Services.Utility;
+
+public class ParseSettingsUtility
 {
     public Config ParseFile(string filePath)
     {
@@ -14,7 +16,7 @@ public class ParseSettings
 
         if (config == null)
         {
-            throw new Exception("Failed to parse settings file");
+            throw new Exception("Settings file is empty or invalid. Please check if the file './settings.json' exists and is valid.");
         }
 
         return config;

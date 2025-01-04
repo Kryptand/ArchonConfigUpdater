@@ -2,7 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using ArchonConfigUpdater.Models;
 
-namespace ArchonConfigUpdater;
+namespace ArchonConfigUpdater.Converter;
 
 public class AvailableClassesConverter : JsonConverter<AvailableClasses>
 {

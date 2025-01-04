@@ -1,11 +1,11 @@
 using ArchonConfigUpdater.Models;
+using ArchonConfigUpdater.Services.Contracts;
+using ArchonConfigUpdater.Services.Utility;
 
 namespace ArchonConfigUpdater.Services;
 
-public class ArchonTalentGenerator
+public class TalentGenerator(ITalentSource talentSource) : ITalentGenerator
 {
-    private const string RaidContentType = "raid";
-    private const string MythicPlusContentType = "mythic-plus";
     private const string RaidIdentifierPrefix = "R";
     private const string MythicPlusIdentifierPrefix = "M+";
 
@@ -44,15 +44,15 @@ public class ArchonTalentGenerator
             {
                 var identifier =
                     BuildTalentIdentifierUtility.BuildTalentIdentifier(RaidIdentifierPrefix, difficulty, boss);
-                
-                var talentString = await ArchonWebScraper.GetTalentString(config.BaseUrl, character.Class.ToString(),
-                    spec, RaidContentType, "overview", difficulty, boss);
+
+                var talentString = await talentSource.GetRaidTalentSelectionAsync(character.Class.ToString(),
+                    spec, difficulty, boss);
 
                 if (string.IsNullOrEmpty(talentString))
                 {
                     continue;
                 }
-                
+
 
                 list.Add(new Talent
                 {
@@ -74,15 +74,15 @@ public class ArchonTalentGenerator
         {
             var identifier =
                 BuildTalentIdentifierUtility.BuildTalentIdentifier(MythicPlusIdentifierPrefix, string.Empty, dungeon);
-            
-            var talentString = await ArchonWebScraper.GetTalentString(config.BaseUrl+"/"+config.MythicPlusTalentTimeSpan, character.Class.ToString(),
-                spec, MythicPlusContentType, "overview/10", string.Empty, dungeon);
+
+            var talentString = await talentSource.GetDungeonTalentSelectionAsync(character.Class.ToString(),
+                spec, string.Empty, dungeon);
 
             if (string.IsNullOrEmpty(talentString))
             {
                 continue;
             }
-            
+
             list.Add(new Talent
             {
                 Name = identifier, TalentSelection = talentString, Class = character.Class, Specialization = spec,

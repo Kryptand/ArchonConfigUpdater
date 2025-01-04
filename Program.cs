@@ -1,32 +1,61 @@
-﻿using ArchonConfigUpdater.Services;
+using ArchonConfigUpdater.Services;
+using ArchonConfigUpdater.Services.Contracts;
+using ArchonConfigUpdater.Services.TalentLoadoutEx;
+using ArchonConfigUpdater.Services.TalentSources;
+using ArchonConfigUpdater.Services.Utility;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+
+namespace ArchonConfigUpdater;
 
 internal class Program
 {
     private static async Task Main(string[] args)
     {
+        var host = Host.CreateDefaultBuilder(args)
+            .ConfigureServices((_, services) =>
+            {
+                services.AddSingleton<ParseSettingsUtility>();
+                services.AddTransient<ITalentUpdater, TalentsLoadoutExTalentUpdater>();
+                services.AddTransient<ITalentSource, ArchonTalentSource>();
+                services.AddTransient<ITalentGenerator, TalentGenerator>();
+            })
+            .ConfigureLogging(logging =>
+            {
+                logging.ClearProviders();
+                logging.AddConsole();
+                logging.SetMinimumLevel(LogLevel.Warning);
+            })
+            .Build();
+        
+        var logger = host.Services.GetRequiredService<ILogger<Program>>();
+        
         try
         {
-            var config = new ParseSettings().ParseFile("./settings.json");
+            var config = host.Services.GetRequiredService<ParseSettingsUtility>().ParseFile("./settings.json");
 
-            var talentCache = new TalentCache("./talentCache.json");
+            VerifyConfigUtility.VerifyConfig(config);
 
-            if (!talentCache.TryGetCachedTalents(out var talents))
-            {
-                var updateTalentsService = new ArchonTalentGenerator();
-                talents = await updateTalentsService.GenerateTalents(config);
-                talentCache.SaveTalentsToCache(talents);
-            }
+            var talentGenerator = host.Services.GetRequiredService<ITalentGenerator>();
+            
+            var talents = await talentGenerator.GenerateTalents(config);
 
-            var updateTalentsServicse = new UpdateTalentLoadoutExTalentsService();
-            updateTalentsServicse.UpdateTalents(config, talents);
+            var updateTalentsService = host.Services.GetRequiredService<ITalentUpdater>();
 
-            Console.WriteLine("Talents updated successfully");
+            await updateTalentsService.UpdateTalentsAsync(config, talents);
+
+            logger.LogInformation("Exiting application.");
+            Environment.Exit(1);
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            Console.WriteLine(ex.StackTrace);
-            Console.WriteLine("Failed to update talents");
+            logger.LogCritical(ex.Message);
+            logger.LogCritical(ex.StackTrace);
+         
+            logger.LogCritical("An error occurred. Exiting application.");
         }
+
+        await host.RunAsync();
     }
 }

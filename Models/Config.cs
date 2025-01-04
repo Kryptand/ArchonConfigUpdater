@@ -8,5 +8,4 @@ public sealed class Config
     public List<string> RaidBosses { get; set; }
     public List<string> Dungeons { get; set; }
     public List<string> RaidDifficulties { get; set; }
-    public string MythicPlusTalentTimeSpan { get; set; }
 }

@@ -1,6 +1,6 @@
-namespace ArchonConfigUpdater.Services;
+namespace ArchonConfigUpdater.Services.Utility;
 
-internal class BuildTalentIdentifierUtility
+public static class BuildTalentIdentifierUtility
 {
     public static string BuildTalentIdentifier(string ContentType, string Difficulty, string Encounter)
     {

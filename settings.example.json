@@ -10,7 +10,7 @@
       ]
     }
   ],
-  "mythicPlusTalentTimeSpan":"last-week",
+  "mythicPlusTalentTimeSpan": "last-week",
   "raidDifficulties": [
     "heroic",
     "mythic"

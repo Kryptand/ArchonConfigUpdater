@@ -1,24 +1,49 @@
 using System.Net;
+using ArchonConfigUpdater.Services.Contracts;
 using HtmlAgilityPack;
+using Microsoft.Extensions.Logging;
 
-namespace ArchonConfigUpdater.Services;
+namespace ArchonConfigUpdater.Services.TalentSources;
 
-public class ArchonWebScraper
+public class ArchonTalentSource : ITalentSource
 {
-    private static readonly HttpClient Client = new();
+    private readonly string _archonUrl =
+        "https://www.archon.gg/wow/builds/{spec}/{class}/{contentType}/{tier}/{difficulty}/{encounter}";
 
-    public static async Task<string> GetTalentString(string url, string className, string spec, string contentType,
+    private readonly HttpClient _client = new();
+    private readonly ILogger<ArchonTalentSource> _logger;
+
+    public ArchonTalentSource(ILogger<ArchonTalentSource> logger)
+    {
+        _logger = logger;
+    }
+
+    public Task<string> GetDungeonTalentSelectionAsync(string className, string spec, string difficulty,
+        string encounter)
+    {
+        return GetTalentSelectionAsync(_archonUrl, className + "/" + "last-week", spec, "mythic-plus", "overview/10",
+            difficulty, encounter);
+    }
+
+    public Task<string> GetRaidTalentSelectionAsync(string className, string spec, string difficulty, string encounter)
+    {
+        return GetTalentSelectionAsync(_archonUrl, className, spec, "raid", "overview", difficulty, encounter);
+    }
+
+    private async Task<string> GetTalentSelectionAsync(string url, string className, string spec, string contentType,
         string tier, string difficulty, string encounter)
     {
-        className=MapClassName(className);
+        className = MapClassName(className);
         url = PrepareUrl(url, className, spec, contentType, tier, difficulty, encounter);
 
         try
         {
-            var html = await Client.GetStringAsync(url);
+            var html = await _client.GetStringAsync(url);
 
             var doc = new HtmlDocument();
 
+            _logger.LogDebug($"Talent string for {className} {spec} {contentType} {tier} {difficulty} {encounter} has been loaded successfully");
+   
             doc.LoadHtml(html);
 
             var linkNode =
@@ -32,21 +57,22 @@ public class ArchonWebScraper
             {
                 throw new Exception("Could not find talent string");
             }
-            
-            
+
+
             return result;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-           // if the error is 500 this means that the current boss has not enough data so we can ignore it
-              if (ex is HttpRequestException {StatusCode:HttpStatusCode.InternalServerError})
-              {
-                  Console.WriteLine($"Could not find talent string for {className} {spec} {contentType} {tier} {difficulty} {encounter}");
-                  
+            // if the error is 500 this means that the current boss has not enough data so we can ignore it
+            if (ex is HttpRequestException { StatusCode: HttpStatusCode.InternalServerError })
+            {
+                _logger.LogWarning(
+                    $"Could not find talent string for {className} {spec} {contentType} {tier} {difficulty} {encounter}");
+
                 return string.Empty;
-              }
+            }
         }
-        
+
         return string.Empty;
     }
 
@@ -56,7 +82,7 @@ public class ArchonWebScraper
         {
             "DeathKnight" => "death-knight",
             "DemonHunter" => "demon-hunter",
-            _=>className.ToLowerInvariant()
+            _ => className.ToLowerInvariant()
         };
     }
 
