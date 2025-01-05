@@ -41,6 +41,7 @@ public static class TalentLoadoutAdapter
 
         return reformatted.ToString();
     }
+
     private static bool TryParseClassKey(string line, out string classKey)
     {
         classKey = null;
@@ -156,6 +157,7 @@ public static class TalentLoadoutAdapter
 
         return specializations.Any(spec => spec.SpecIndex == specKey);
     }
+
     public static Models.TalentLoadoutEx FromCustomFormat(string customFormat)
     {
         customFormat = ReformatToSingleLine(customFormat);

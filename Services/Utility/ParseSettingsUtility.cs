@@ -16,7 +16,8 @@ public class ParseSettingsUtility
 
         if (config == null)
         {
-            throw new Exception("Settings file is empty or invalid. Please check if the file './settings.json' exists and is valid.");
+            throw new Exception(
+                "Settings file is empty or invalid. Please check if the file './settings.json' exists and is valid.");
         }
 
         return config;

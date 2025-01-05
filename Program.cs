@@ -28,9 +28,9 @@ internal class Program
                 logging.SetMinimumLevel(LogLevel.Warning);
             })
             .Build();
-        
+
         var logger = host.Services.GetRequiredService<ILogger<Program>>();
-        
+
         try
         {
             var config = host.Services.GetRequiredService<ParseSettingsUtility>().ParseFile("./settings.json");
@@ -38,7 +38,7 @@ internal class Program
             VerifyConfigUtility.VerifyConfig(config);
 
             var talentGenerator = host.Services.GetRequiredService<ITalentGenerator>();
-            
+
             var talents = await talentGenerator.GenerateTalents(config);
 
             var updateTalentsService = host.Services.GetRequiredService<ITalentUpdater>();
@@ -52,7 +52,7 @@ internal class Program
         {
             logger.LogCritical(ex.Message);
             logger.LogCritical(ex.StackTrace);
-         
+
             logger.LogCritical("An error occurred. Exiting application.");
         }
 

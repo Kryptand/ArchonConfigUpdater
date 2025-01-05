@@ -42,8 +42,11 @@ public class TalentsLoadoutExTalentUpdater : ITalentUpdater
         foreach (var specEntry in classEntry.Value)
         {
             var specName = specEntry.Key;
+            
             var specIndex = ClassesWithSpecializations.GetSpecIndex(classEntry.Key, specName);
+            
             var talentsForSpec = specEntry.Value;
+            
             var talentLoadoutExTalents = talentsForSpec.Select(t => new TalentLoadoutExTalent
             {
                 Name = t.Name,

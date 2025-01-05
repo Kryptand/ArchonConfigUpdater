@@ -5,24 +5,47 @@ using Microsoft.Extensions.Logging;
 
 namespace ArchonConfigUpdater.Services.TalentSources;
 
-public class ArchonTalentSource : ITalentSource
+public class ArchonTalentSource(ILogger<ArchonTalentSource> logger) : ITalentSource
 {
     private readonly string _archonUrl =
         "https://www.archon.gg/wow/builds/{spec}/{class}/{contentType}/{tier}/{difficulty}/{encounter}";
 
     private readonly HttpClient _client = new();
-    private readonly ILogger<ArchonTalentSource> _logger;
+    private readonly string lastWeekIdentifier = "last-week";
+    private readonly string thisWeekIdentifier = "this-week";
 
-    public ArchonTalentSource(ILogger<ArchonTalentSource> logger)
-    {
-        _logger = logger;
-    }
-
-    public Task<string> GetDungeonTalentSelectionAsync(string className, string spec, string difficulty,
+    public async Task<string> GetDungeonTalentSelectionAsync(string className, string spec, string difficulty,
         string encounter)
     {
-        return GetTalentSelectionAsync(_archonUrl, className + "/" + "last-week", spec, "mythic-plus", "overview/10",
+        var dayOfWeek = DateTime.Now.DayOfWeek;
+
+        var isResetDay = dayOfWeek == DayOfWeek.Wednesday;
+
+        var timeSpan = isResetDay ? lastWeekIdentifier : thisWeekIdentifier;
+
+        var result = await GetTalentSelectionAsync(_archonUrl + "/" + timeSpan, className, spec, "mythic-plus",
+            "overview/10",
             difficulty, encounter);
+
+        if (!string.IsNullOrEmpty(result))
+        {
+            return result;
+        }
+
+        if (timeSpan == lastWeekIdentifier)
+        {
+            result = await GetTalentSelectionAsync(_archonUrl + "/" + thisWeekIdentifier, className, spec,
+                "mythic-plus", "overview/10",
+                difficulty, encounter);
+
+            return result;
+        }
+
+        result = await GetTalentSelectionAsync(_archonUrl + "/" + lastWeekIdentifier, className, spec, "mythic-plus",
+            "overview/10",
+            difficulty, encounter);
+
+        return result;
     }
 
     public Task<string> GetRaidTalentSelectionAsync(string className, string spec, string difficulty, string encounter)
@@ -42,8 +65,7 @@ public class ArchonTalentSource : ITalentSource
 
             var doc = new HtmlDocument();
 
-            _logger.LogDebug($"Talent string for {className} {spec} {contentType} {tier} {difficulty} {encounter} has been loaded successfully");
-   
+
             doc.LoadHtml(html);
 
             var linkNode =
@@ -58,6 +80,8 @@ public class ArchonTalentSource : ITalentSource
                 throw new Exception("Could not find talent string");
             }
 
+            logger.LogDebug(
+                $"Talent string for {className} {spec} {contentType} {tier} {difficulty} {encounter} has been loaded successfully");
 
             return result;
         }
@@ -66,7 +90,7 @@ public class ArchonTalentSource : ITalentSource
             // if the error is 500 this means that the current boss has not enough data so we can ignore it
             if (ex is HttpRequestException { StatusCode: HttpStatusCode.InternalServerError })
             {
-                _logger.LogWarning(
+                logger.LogWarning(
                     $"Could not find talent string for {className} {spec} {contentType} {tier} {difficulty} {encounter}");
 
                 return string.Empty;
