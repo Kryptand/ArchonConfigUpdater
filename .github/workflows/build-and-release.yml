@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up .NET
         uses: actions/setup-dotnet@v3
@@ -64,21 +64,21 @@ jobs:
 
       - name: Upload artifact for macOS ARM64
         if: matrix.os == 'macos-latest' && matrix.architecture == 'arm64'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: macos-latest-arm64
           path: macos-latest-arm64.zip
 
       - name: Upload artifact for Windows x64
         if: matrix.os == 'windows-latest' && matrix.architecture == 'x64'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: windows-latest-x64
           path: windows-latest-x64.zip
 
       - name: Upload artifact for Windows ARM64
         if: matrix.os == 'windows-latest' && matrix.architecture == 'arm64'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: windows-latest-arm64
           path: windows-latest-arm64.zip
@@ -89,7 +89,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Create Release
         uses: actions/create-release@v1
@@ -102,7 +102,7 @@ jobs:
           prerelease: false
 
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: ./release
 
