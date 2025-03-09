@@ -19,6 +19,35 @@ recommended talent builds. It automates the process of applying these builds to 
 2. Ensure your settings are correctly configured in `settings.json`.
 3. Run the application to update your character's talents based on the recommended builds.
 
+### Command-Line Options
+
+The application supports the following command-line options:
+
+- `--check-update`: Checks if an update is available and exits
+- `--update`: Forces the application to download and install the latest update
+
+Examples:
+```
+ArchonConfigUpdater --check-update
+ArchonConfigUpdater --update
+```
+
+## Auto-Update Feature
+
+The application has a built-in update mechanism that can:
+- Automatically check for updates on GitHub
+- Prompt you to download and install updates
+- Automatically install updates if configured
+
+You can configure the update behavior in `settings.json`:
+
+```json
+"update": {
+  "autoCheckForUpdates": true,  // Set to false to disable update checks
+  "autoInstallUpdates": false   // Set to true to automatically install updates without prompting
+}
+```
+
 ## Contributing
 
 Contributions are welcome! Please fork the repository and submit a pull request for any enhancements or bug fixes.

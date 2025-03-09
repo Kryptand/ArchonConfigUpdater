@@ -21,6 +21,16 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
+          
+      - name: Set version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+        
+      - name: Update version in project file
+        run: |
+          sed -i "s/<Version>.*<\/Version>/<Version>$VERSION<\/Version>/g" ArchonConfigUpdater.csproj
+          sed -i "s/<AssemblyVersion>.*<\/AssemblyVersion>/<AssemblyVersion>$VERSION<\/AssemblyVersion>/g" ArchonConfigUpdater.csproj
+          sed -i "s/<FileVersion>.*<\/FileVersion>/<FileVersion>$VERSION<\/FileVersion>/g" ArchonConfigUpdater.csproj
 
       - name: Install dependencies
         run: dotnet restore

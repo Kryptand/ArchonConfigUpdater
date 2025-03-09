@@ -168,9 +168,10 @@ public static class TalentLoadoutAdapter
             ClassTalents = new Dictionary<string, Dictionary<int, List<TalentLoadoutExTalent>>>()
         };
 
-        string[] lines = customFormat.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+        string[] lines = customFormat.Split(['\n', '\r'], StringSplitOptions.RemoveEmptyEntries);
 
         string currentClassKey = null;
+        
         int? currentSpecKey = null;
 
         foreach (var line in lines)

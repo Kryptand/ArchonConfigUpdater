@@ -48,5 +48,11 @@ public static class VerifyConfigUtility
                 throw new Exception("No specializations found for character in config");
             }
         }
+        
+        // Ensure update settings exist
+        if (config.Update == null)
+        {
+            config.Update = new UpdateSettings();
+        }
     }
 }

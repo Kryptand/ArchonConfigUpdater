@@ -34,5 +34,9 @@
     "the-dawnbreaker",
     "the-necrotic-wake",
     "the-stonevault"
-  ]
+  ],
+  "update": {
+    "autoCheckForUpdates": true,
+    "autoInstallUpdates": false
+  }
 }
